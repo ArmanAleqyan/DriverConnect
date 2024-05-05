@@ -1,0 +1,1120 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Driver Connect API",
+        "description": "API for managing job categories in the Driver Connect project",
+        "contact": {
+            "name": "Admin",
+            "email": "aleqyanarman@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/get_whatsapp_and_telegram": {
+            "get": {
+                "tags": [
+                    "Social Data"
+                ],
+                "summary": "Get WhatsApp and Telegram contact information",
+                "operationId": "1f1108add1619508ebf6382ee80d3d45",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "description": "Status of the operation",
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/job_category": {
+            "get": {
+                "tags": [
+                    "Job Categories"
+                ],
+                "summary": "Get list of job categories",
+                "operationId": "3bee95b93874d816ff938e55a7cc39db",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "description": "Status of the operation",
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/get_regions": {
+            "get": {
+                "tags": [
+                    "Regions"
+                ],
+                "summary": "Get list of regions",
+                "operationId": "7d8db2f22bdd64e428dd3825d1ef35e4",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "description": "Status of the operation",
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/drive_license_country": {
+            "get": {
+                "tags": [
+                    "Driver License Country"
+                ],
+                "summary": "Get list of driver license countries",
+                "operationId": "0fbe3f0fd03828d05f7dc294e51f1c69",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "description": "Status of the operation",
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/car_color": {
+            "get": {
+                "tags": [
+                    "Car"
+                ],
+                "summary": "Get list of car colors",
+                "operationId": "5c97af2a35b8b076da596242167702bf",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "description": "Status of the operation",
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/get_car_marks": {
+            "get": {
+                "tags": [
+                    "Car"
+                ],
+                "summary": "Get list of car marks",
+                "operationId": "09edf95999e85b8213f70a2c3304703b",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search string",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "description": "Status of the operation",
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/get_car_model": {
+            "get": {
+                "tags": [
+                    "Car"
+                ],
+                "summary": "Get list of car models by mark ID",
+                "operationId": "376f489618874da668a86aa04852f16d",
+                "parameters": [
+                    {
+                        "name": "mark_id",
+                        "in": "query",
+                        "description": "ID of the car mark",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search string",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "description": "Status of the operation",
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "description": "Status of the operation",
+                                            "type": "boolean"
+                                        },
+                                        "validation_error": {
+                                            "description": "Indicates whether the error is due to validation",
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "description": "Validation error messages",
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth_user_info": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get authenticated user information",
+                "description": "Endpoint to retrieve information about the authenticated user.",
+                "operationId": "authUserInfo",
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User not found."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal server error."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/register_or_login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Register a new user or login an existing user",
+                "operationId": "811994d1699c014409541545fe99fdf7",
+                "requestBody": {
+                    "description": "User phone number",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "phone"
+                                ],
+                                "properties": {
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "1234567890"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "description": "Status of the operation",
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "message": {
+                                            "description": "Message indicating the status",
+                                            "type": "string",
+                                            "example": "Code sent to your phone"
+                                        },
+                                        "code": {
+                                            "description": "Verification code sent to the user's phone",
+                                            "type": "string",
+                                            "example": "1234"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "description": "Status of the operation",
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "validation_error": {
+                                            "description": "Indicates whether the error is due to validation",
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "message": {
+                                            "description": "Validation error messages",
+                                            "type": "object",
+                                            "example": {
+                                                "phone": [
+                                                    "The phone field is required"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/confirm_login_or_register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Confirm login or register by verifying phone number",
+                "operationId": "de4f393840e275996daa31750175b206",
+                "requestBody": {
+                    "description": "User phone number and verification code",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "phone",
+                                    "code"
+                                ],
+                                "properties": {
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "1234567890"
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "example": "1234"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "description": "Status of the operation",
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "message": {
+                                            "description": "Message indicating the status",
+                                            "type": "string",
+                                            "example": "confirmed"
+                                        },
+                                        "token": {
+                                            "description": "Access token for authenticated user",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "description": "Status of the operation",
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "validation_error": {
+                                            "description": "Indicates whether the error is due to validation",
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "message": {
+                                            "description": "Validation error messages",
+                                            "type": "object",
+                                            "example": {
+                                                "phone": [
+                                                    "The phone field is required"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "description": "Status of the operation",
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "message": {
+                                            "description": "Message indicating the error",
+                                            "type": "string",
+                                            "example": "Неверный код подтверждения"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/upload_car_license": {
+            "post": {
+                "tags": [
+                    "Car"
+                ],
+                "summary": "Upload car license photos",
+                "description": "Endpoint to upload front and back photos of a car license and extract relevant information from the photos.",
+                "operationId": "uploadCarLicense",
+                "requestBody": {
+                    "description": "Car license photos to upload",
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "car_license_front_photo",
+                                    "car_license_back_photo"
+                                ],
+                                "properties": {
+                                    "car_license_front_photo": {
+                                        "description": "Front photo of the car license",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "car_license_back_photo": {
+                                        "description": "Back photo of the car license",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "year": {
+                                                    "type": "string",
+                                                    "example": "2023"
+                                                },
+                                                "callsign": {
+                                                    "type": "string",
+                                                    "example": "ABC123"
+                                                },
+                                                "vin": {
+                                                    "type": "string",
+                                                    "example": "1HGBH41JXMN109186"
+                                                },
+                                                "color_name": {
+                                                    "type": "string",
+                                                    "example": "Red"
+                                                },
+                                                "mark_name": {
+                                                    "type": "string",
+                                                    "example": "Toyota"
+                                                },
+                                                "model_name": {
+                                                    "type": "string",
+                                                    "example": "Camry"
+                                                },
+                                                "licence_plate_number": {
+                                                    "type": "string",
+                                                    "example": "XYZ789"
+                                                },
+                                                "car_license_front_photo": {
+                                                    "type": "string",
+                                                    "example": "front_photo.jpg"
+                                                },
+                                                "car_license_back_photo": {
+                                                    "type": "string",
+                                                    "example": "back_photo.jpg"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "validation_error": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal server error."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/upload_photo_driver_license": {
+            "post": {
+                "tags": [
+                    "Driver License"
+                ],
+                "summary": "Upload driver license photos",
+                "description": "Endpoint to upload front and back photos of a driver license and extract relevant information.",
+                "operationId": "uploadPhotoDriverLicense",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "driver_license_front_photo",
+                                    "driver_license_back_photo"
+                                ],
+                                "properties": {
+                                    "driver_license_front_photo": {
+                                        "description": "Front photo of the driver license",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "driver_license_back_photo": {
+                                        "description": "Back photo of the driver license",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "description": "Extracted information from driver license photos",
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "validation_error": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Что то пошло не так попробуцте немного позже"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/create_account": {
+            "post": {
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Создание учетной записи пользователя",
+                "operationId": "46946c1f12f8b954559039eeaa264bf3",
+                "requestBody": {
+                    "description": "Данные для создания учетной записи",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "job_category_id",
+                                    "region_id"
+                                ],
+                                "properties": {
+                                    "job_category_id": {
+                                        "description": "ID категории работы",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "region_id": {
+                                        "description": "ID региона",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "birth_date": {
+                                        "description": "Дата рождения ",
+                                        "type": "string",
+                                        "example": "1997-09-15"
+                                    },
+                                    "country_id": {
+                                        "description": "ID country_id",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "driver_license_expiry_date": {
+                                        "description": "Дата истечения срока",
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "driver_license_issue_date": {
+                                        "description": "Дата выдачи водительского удостоверения",
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "driver_license_number": {
+                                        "description": "Номер водительского удостоверения",
+                                        "type": "string"
+                                    },
+                                    "driver_license_experience_total_since_date": {
+                                        "description": "Общий опыт вождения с указанной даты",
+                                        "type": "integer"
+                                    },
+                                    "person_full_name_first_name": {
+                                        "description": "Имя пользователя",
+                                        "type": "string"
+                                    },
+                                    "scanning_person_full_name_first_name": {
+                                        "description": "Имя пользователя",
+                                        "type": "string"
+                                    },
+                                    "person_full_name_last_name": {
+                                        "description": "Фамилия пользователя",
+                                        "type": "string"
+                                    },
+                                    "scanning_person_full_name_last_name": {
+                                        "description": "Фамилия пользователя",
+                                        "type": "string"
+                                    },
+                                    "person_full_name_middle_name": {
+                                        "description": "Отчество пользователя",
+                                        "type": "string"
+                                    },
+                                    "scanning_person_full_name_middle_name": {
+                                        "description": "Отчество пользователя",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Успешное создание учетной записи",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "description": "Статус операции",
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "description": "Сообщение о результате операции",
+                                            "type": "string",
+                                            "example": "Вы успешно создали аккаунт пользователя"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Ошибка валидации данных",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "description": "Статус операции",
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "validation_error": {
+                                            "description": "Ошибка валидации",
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "description": "Сообщение об ошибке валидации",
+                                            "type": "object",
+                                            "example": {
+                                                "job_category_id": [
+                                                    "The job category ID field is required"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Ошибка аутентификации",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "description": "Статус операции",
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Неавторизованный доступ"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "description": "Статус операции",
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Внутренняя ошибка сервера"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/create_new_car": {
+            "post": {
+                "tags": [
+                    "Cars"
+                ],
+                "summary": "Create a new car",
+                "description": "Endpoint to create a new car with provided details.",
+                "operationId": "createNewCar",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "callsign",
+                                    "licence_plate_number",
+                                    "registration_certificate",
+                                    "mark_name",
+                                    "model_name",
+                                    "year",
+                                    "vin",
+                                    "color_name"
+                                ],
+                                "properties": {
+                                    "callsign": {
+                                        "type": "string",
+                                        "example": "ABC123"
+                                    },
+                                    "licence_plate_number": {
+                                        "type": "string",
+                                        "example": "ABC1234"
+                                    },
+                                    "registration_certificate": {
+                                        "type": "string",
+                                        "example": "Registration Certificate"
+                                    },
+                                    "mark_name": {
+                                        "type": "string",
+                                        "example": "Toyota"
+                                    },
+                                    "model_name": {
+                                        "type": "string",
+                                        "example": "Camry"
+                                    },
+                                    "year": {
+                                        "type": "integer",
+                                        "example": 2022
+                                    },
+                                    "vin": {
+                                        "type": "string",
+                                        "example": "VIN123456789"
+                                    },
+                                    "color_name": {
+                                        "type": "string",
+                                        "example": "Red"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Машина успешно создана"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "validation_error": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Что то пошло нне так"
+                                        },
+                                        "yandex_error": {
+                                            "type": "object",
+                                            "example": {
+                                                "error": "Something went wrong with Yandex API"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

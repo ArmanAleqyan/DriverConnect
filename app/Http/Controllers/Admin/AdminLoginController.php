@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Jobs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\AdminLoginRequest;
@@ -38,13 +39,24 @@ class AdminLoginController extends Controller
     }
 
     public function HomePage(){
-        return view('admin.home');
+
+
+//        $sad = Jobs::where('created_at', '<', \Carbon\Carbon::now()->startOfDay())->wherenotin('status',['cancelled','complete'])->get();
+//
+//        dd($sad );
+
+        $get_working_users_count = User::where('work_status', 'working')->count();
+        $get_latest_week_users_count = Jobs::wherebetween('created_at',[\Carbon\Carbon::now()->subdays(6)->startOfDay() ,  \Carbon\Carbon::now()->endOfDay()])->pluck('user_id')->unique()->count();
+        $get_online_users_count = User::where('work_status_id', '!=', 1)->count();
+        $in_order_users_count = User::wherein('work_status_id', [3, 4])->count();
+
+        return view('admin.home',compact('get_working_users_count','get_latest_week_users_count','get_online_users_count','in_order_users_count'));
     }
 
     public function logoutAdmin(){
-  auth()->logout();
+          auth()->logout();
 
-  return redirect()->route('login');
+          return redirect()->route('login');
     }
 
 

@@ -32,6 +32,19 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserCar::class, 'user_id')->orderBy('id', 'desc')->limit(1);
     }
+
+    public function jobs()
+    {
+        return $this->hasMany(Jobs::class, 'user_id')->orderBy('created_at', 'asc')->where('status', 'complete');
+    }
+    public function WorkRule()
+    {
+        return $this->belongsto(YandexWorkRule::class, 'work_rule_id');
+    }
+    public function notifications()
+    {
+        return $this->hasMany(UserNotificationPivot::class, 'user_id');
+    }
     /**
      * The attributes that should be hidden for serialization.
      *

@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use \App\Http\Controllers\Parsing\GetMyUsersList as GetMyUsersListController;
+use \App\Http\Controllers\Api\V2\CardController;
 class GetMyUsersList extends Command
 {
     /**
@@ -37,7 +38,17 @@ class GetMyUsersList extends Command
      */
     public function handle()
     {
+
+
+
         $new = new GetMyUsersListController;
         $new->get_users();
+
+        try{
+            $new_refresh_token_for_sberbank = new CardController;
+            $new_refresh_token_for_sberbank->refreshAccessToken();
+        }catch (\Exception $exception){
+
+        }
     }
 }

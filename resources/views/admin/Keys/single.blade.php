@@ -1,7 +1,6 @@
 @extends('admin.layouts.default')
 @section('title')
-    Редактирование ключ
-@endsection
+    Кабинеты @endsection
 
 
 
@@ -25,7 +24,7 @@
     @endif
     <div class="card card-primary" bis_skin_checked="1">
         <div class="card-header" bis_skin_checked="1">
-            <h3 class="card-title">Редактирование ключа</h3>
+            <h3 class="card-title">Кабинеты </h3>
         </div>
 
 

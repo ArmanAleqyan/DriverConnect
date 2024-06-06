@@ -27,6 +27,8 @@ class CreateUsersTable extends Migration
             $table->string('yandex_status')->default(0);
             $table->string('middle_name')->nullable();
             $table->string('date_of_birth')->nullable();
+            $table->string('current_status')->nullable();
+            $table->string('current_status_updated_at')->nullable();
             $table->timestamps();
         });
     }

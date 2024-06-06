@@ -24,6 +24,24 @@ use Illuminate\Support\Str;
 
 class RegisterController extends Controller
 {
+
+
+    public function logout(Request $request){
+
+
+
+        $user = \auth()->user();
+        $user->tokens()->delete();
+
+
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Logouted'
+        ],200);
+
+    }
+
     /**
      * @OA\Get(
      *     path="/api/auth_user_info",
@@ -66,9 +84,11 @@ class RegisterController extends Controller
     public function auth_user_info(){
         $get_user = User::where('id', auth()->user()->id)->first();
 
+        $get_car = UserCar::where('user_id', auth()->user()->id)->with('model', 'mark')->where('connected_status', 1)->first();
         return response()->json([
            'status' => true,
-           'user' => $get_user
+           'user' => $get_user,
+            'car' => $get_car
         ]);
     }
 
@@ -142,6 +162,14 @@ class RegisterController extends Controller
             ],400);
         }
 
+        $get_user = User::where('phone', $request->phone)->first();
+
+        if ($get_user != null && $get_user->work_status == 'fired'){
+            return response()->json([
+               'status' => false,
+                'message' => 'Вы уволены  Пожалусто свяжитес с администратором'
+            ],422);
+        }
     $send_message =    $this->send_sms($request->phone);
              User::updateorcreate(['phone'=> $request->phone], [
             'phone' => $request->phone,
@@ -394,7 +422,7 @@ class RegisterController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Что то пошло не так попробуцте немного позже'
-            ]);
+            ],422);
         }
 
         $data = $result;
@@ -459,6 +487,7 @@ class RegisterController extends Controller
      * )
      */
     public function upload_photo_driver_license(Request $request){
+
         $rules=array(
             'driver_license_front_photo' => 'required|image',
             'driver_license_back_photo' => 'required|image',
@@ -537,7 +566,7 @@ class RegisterController extends Controller
            return response()->json([
               'status' => false,
                'message' => 'Что то пошло не так попробуцте немного позже'
-           ]);
+           ],422);
        }
         auth()->user()->update([
            'driver_license_front_photo' =>$originalFile,
@@ -696,12 +725,15 @@ class RegisterController extends Controller
             $get_drive_license_country = DriverLicense::where('id', $request->country_id)->first();
 
 
+//            $send_or_not_send = 1;
             if ($send_or_not_send != 0){
+
                 $response = Http::withHeaders([
                     'X-Park-ID' => $X_Park_ID,
                     'X-Client-ID' => $X_Client_ID,
                     'X-API-Key' => $X_API_Key,
                     'X-Idempotency-Token' =>$X_Idempotency_Token,
+                    'Accept-Language' => 'ru'
                 ])
                     ->post(env('yandex_request_url').$yandex_prefix, [
                         'account' => [
@@ -739,7 +771,6 @@ class RegisterController extends Controller
 //                        'tax_identification_number' => '7743013902'
                         ],
                         'profile' => [
-//                        'comment' => 'great driver',
                             'hire_date' => Carbon::now()->format('Y-m-d')
                         ]
                     ]);
@@ -761,6 +792,8 @@ class RegisterController extends Controller
                 'work_rule_id' =>$get_work_rule->id,
                 'sended_in_yandex_status' =>$send_or_not_send
             ]);
+
+
             if (isset($responses['message'] ) && $responses['message'] == 'duplicate_driver_license'){
                 return  response()->json([
                     'status' => false,
@@ -768,6 +801,7 @@ class RegisterController extends Controller
                     'yandex_error' =>  $responses??null
                 ],422);
             }
+
 
             if (isset($responses['contractor_profile_id'])){
                 return  response()->json([
@@ -780,7 +814,7 @@ class RegisterController extends Controller
                    'status' => true,
                    'message' => 'Вы успешно создали акаунт пользвателя подождите с вами свяжетса менеджер',
                    'yandex_error' =>  $responses??null
-                ]);
+                ],422);
             }
         }if ($request->job_category_id == 3){
             $rules=array(
@@ -818,6 +852,7 @@ class RegisterController extends Controller
                 'X-Client-ID' => $X_Client_ID,
                 'X-API-Key' => $X_API_Key,
                 'X-Idempotency-Token' =>$X_Idempotency_Token,
+                'Accept-Language' => 'ru'
             ];
 
             $response = Http::withHeaders($headers)->post('https://fleet-api.taxi.yandex.net/v2/parks/contractors/walking-courier-profile', $data);
@@ -842,9 +877,9 @@ class RegisterController extends Controller
                 ]);
             }else{
                 return  response()->json([
-                    'status' => true,
-                    'message' => 'Ваш Акаунт Успешно создался',
-                    'yandex_error' =>  $responses
+                    'status' => false,
+                    'message' => 'Что то пошло не так',
+                    'yandex_error' =>  $responses??null
                 ]);
             }
         }
@@ -959,6 +994,7 @@ class RegisterController extends Controller
             'X-Client-ID' => $X_Client_ID,
             'X-API-Key' => $X_API_Key,
             'X-Idempotency-Token' =>$X_Idempotency_Token,
+            'Accept-Language' => 'ru'
         ])->post('https://fleet-api.taxi.yandex.net/v2/parks/vehicles/car', [
 //            "cargo" => [
 //                "cargo_hold_dimensions" => [
@@ -1016,11 +1052,11 @@ class RegisterController extends Controller
         if (isset($response['vehicle_id'])){
             UserCar::updateOrcreate(['yandex_car_id' => $response['vehicle_id']], [
                 'yandex_car_id' =>$response['vehicle_id'],
-                'normalized_number' => $request->licence_plate_number,
+                'normalized_number' => $request->callsign,
                 'car_license_back_photo' => $request->car_license_back_photo,
                 'car_license_front_photo' => $request->car_license_front_photo,
-                'number' => $request->licence_plate_number,
-                'callsign' => $request->licence_plate_number,
+                'number' => $request->callsign,
+                'callsign' => $request->callsign,
                 'registration_cert' => $request->registration_certificate,
                 'vin' => $request->vin,
                 'year' => (int)$request->year,

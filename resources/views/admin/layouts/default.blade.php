@@ -8,11 +8,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title')</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{asset('admin/plugins/fontawesome-free/css/all.min.css')}}">
+    <script src="https://kit.fontawesome.com/c9c45b0eac.js" crossorigin="anonymous"></script>
+
     <!-- Theme style -->
     <link rel="stylesheet" href="{{asset('admin/dist/css/adminlte.min.css')}}">
         <link rel="stylesheet" href="https://cdn.datatables.net/1.11.10/css/jquery.dataTables.min.css">
@@ -20,6 +23,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
         <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
         <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+    @yield('page_css')
 </head>
 <body class="hold-transition sidebar-mini">
 @if(auth()->check())
@@ -87,26 +91,26 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <!-- Sidebar -->
         <div class="sidebar">
             <!-- Sidebar user panel (optional) -->
-            <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                <div class="image">
-                    <img src="{{asset('admin/dist/img/user2-160x160.jpg')}}" class="img-circle elevation-2" alt="User Image">
-                </div>
-                <div class="info">
-                    <a href="#" class="d-block">{{auth()->user()->name}}</a>
-                </div>
-            </div>
+{{--            <div class="user-panel mt-3 pb-3 mb-3 d-flex">--}}
+{{--                <div class="image">--}}
+{{--                    <img src="{{asset('admin/dist/img/user2-160x160.jpg')}}" class="img-circle elevation-2" alt="User Image">--}}
+{{--                </div>--}}
+{{--                <div class="info">--}}
+{{--                    <a href="#" class="d-block">{{auth()->user()->name}}</a>--}}
+{{--                </div>--}}
+{{--            </div>--}}
 
             <!-- SidebarSearch Form -->
-            <div class="form-inline">
-                <div class="input-group" data-widget="sidebar-search">
-                    <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
-                    <div class="input-group-append">
-                        <button class="btn btn-sidebar">
-                            <i class="fas fa-search fa-fw"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
+{{--            <div class="form-inline">--}}
+{{--                <div class="input-group" data-widget="sidebar-search">--}}
+{{--                    <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">--}}
+{{--                    <div class="input-group-append">--}}
+{{--                        <button class="btn btn-sidebar">--}}
+{{--                            <i class="fas fa-search fa-fw"></i>--}}
+{{--                        </button>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--            </div>--}}
 
             <!-- Sidebar Menu -->
             <nav class="mt-2">
@@ -117,7 +121,16 @@ scratch. This page gets rid of all links and provides the needed markup only.
          @php
                  $routeName = \Illuminate\Support\Facades\Route::currentRouteName();
          @endphp
-                    <li class="nav-item  @if($routeName== 'new_users'  || $routeName == 'all_users' || $routeName= 'single_page_user')  menu-is-opening menu-open @endif ">
+
+                    <li class="nav-item">
+                        <a href="{{route('HomePage')}}" class="nav-link @if($routeName == 'HomePage' ) active @endif">
+                            <i class="nav-icon fa-solid fa-chart-line"></i>
+                            <p>
+                                Сводка
+                            </p>
+                        </a>
+                    </li>
+                    <li class="nav-item  @if($routeName== 'new_users'  || $routeName == 'all_users' || $routeName == 'single_page_user')  menu-is-opening menu-open @endif ">
                         <a href="#" class="nav-link ">
                             <i class="nav-icon fa fa-users"></i>
                             <p>
@@ -128,13 +141,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         <ul class="nav nav-treeview ">
 
                             <li class="nav-item">
-                                <a href="{{route('new_users')}}" class="nav-link  @if($routeName== 'new_users' ) active @endif">
+                                <a href="{{route('new_users')}}" class="nav-link  @if($routeName == 'new_users' ) active @endif">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Заявки</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{route('all_users')}}" class="nav-link  @if($routeName== 'all_users' ) active @endif">
+                                <a href="{{route('all_users')}}" class="nav-link  @if($routeName == 'all_users' ) active @endif">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Зарегистрированные</p>
                                 </a>
@@ -142,24 +155,63 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         </ul>
                     </li>
                     <li class="nav-item">
-                                                        <a href="{{route('get_all_regions')}}" class="nav-link @if($routeName== 'get_all_regions' || $routeName == 'single_page_region') active @endif">
-                                                            <i class="nav-icon fas fa-th"></i>
-                                                            <p>
-                                                                Регионы
-                                                            </p>
-                                                        </a>
-                                                    </li>
-                                                    <li class="nav-item">
-                                                        <a href="{{route('get_all_key')}}" class="nav-link @if($routeName== 'get_all_key' || $routeName == 'create_key_page' || $routeName =='single_page_key') active @endif">
-                                                            <i class="nav-icon fa fa-key"></i>
-                                                            <p>
-                                                                Ключи
+                        @php
+                            $routes = ['all_jobs','single_page_job'];
+                        @endphp
+
+
+                        <a href="{{route('all_jobs')}}" class="nav-link {{ in_array($routeName, $routes) ? 'active' : '' }}">
+                            <i class="nav-icon fa-solid fa-route"></i>
+                            <p>
+                                Поездки
+                                {{--                                                                <span class="right badge badge-danger">New</span>--}}
+                            </p>
+                        </a>
+                    </li>
+{{--                    <li class="nav-item">--}}
+{{--                                                        <a href="{{route('get_all_regions')}}" class="nav-link @if($routeName == 'get_all_regions' || $routeName == 'single_page_region') active @endif">--}}
+{{--                                                            <i class="nav-icon fas fa-th"></i>--}}
+{{--                                                            <p>--}}
+{{--                                                                Регионы--}}
+{{--                                                            </p>--}}
+{{--                                                        </a>--}}
+{{--                                                    </li>--}}
+
+{{--                    <li class="nav-item">--}}
+{{--                        <a href="{{route('all_news_letters')}}" class="nav-link @if($routeName == 'get_all_regions' || $routeName == 'single_page_region') active @endif">--}}
+{{--                            <i class="nav-icon  fa-solid fa-envelopes-bulk"></i>--}}
+{{--                            <p>--}}
+{{--                                Рассылки--}}
+{{--                            </p>--}}
+{{--                        </a>--}}
+{{--                    </li>--}}
+{{--                                                    <li class="nav-item">--}}
+{{--                                                        <a href="{{route('get_all_key')}}" class="nav-link @if($routeName == 'get_all_key' || $routeName == 'create_key_page' || $routeName =='single_page_key') active @endif">--}}
+{{--                                                            <i class="nav-icon fa fa-key"></i>--}}
+{{--                                                            <p>--}}
+{{--                                                                Ключи--}}
 {{--                                                                <span class="right badge badge-danger">New</span>--}}
-                                                            </p>
-                                                        </a>
-                                                    </li>
+{{--                                                            </p>--}}
+{{--                                                        </a>--}}
+{{--                                                    </li>--}}
+                    <li class="nav-item">
+                        @php
+                            $routes = ['all_faqs', 'create_faq_page', 'single_page_faq'];
+                        @endphp
+                        <a href="{{route('all_faqs')}}" class="nav-link {{ in_array($routeName, $routes) ? 'active' : '' }}">
+                            <i class="nav-icon fa fa-question-circle"></i>
+                            <p>
+                                FAQ
+                                {{--                                                                <span class="right badge badge-danger">New</span>--}}
+                            </p>
+                        </a>
+                    </li>
+
+                    @php
+                    $routes = [ 'settings_page','single_page_letters'];
+                    @endphp
                                                     <li class="nav-item">
-                                                        <a href="{{route('settings_page')}}" class="nav-link @if($routeName== 'settings_page') active @endif">
+                                                        <a href="{{route('settings_page')}}" class="nav-link {{ in_array($routeName, $routes) ? 'active' : '' }}">
                                                             <i class="nav-icon fa fa-cogs"></i>
                                                             <p>
                                                                 Настройки
@@ -167,6 +219,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                                             </p>
                                                         </a>
                                                     </li>
+
+
                 </ul>
             </nav>
             <!-- /.sidebar-menu -->
@@ -214,11 +268,37 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
 <!-- jQuery -->
 @endif
+
 <script src="{{asset('admin/plugins/jquery/jquery.min.js')}}"></script>
+<script src="{{ asset('admin/plugins/select2/js/select2.full.min.js') }}"></script>
+
 <!-- Bootstrap 4 -->
 <script src="{{asset('admin/plugins/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+<!-- ChartJS -->
+<script src="{{asset('admin/plugins/chart.js/Chart.min.js')}}"></script>
 <!-- AdminLTE App -->
 <script src="{{asset('admin/dist/js/adminlte.min.js')}}"></script>
+<!-- AdminLTE for demo purposes -->
+{{--<script src="{{asset('admin/dist/js/demo.js')}}"></script>--}}
+<script>
+
+    $(document).ready(function(){
+        // Сохранение активного таба при его клике
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+
+            var activeTab = $(e.target).attr('href'); // Получаем href активного таба
+            $.ajax({
+                url: "{{ route('saveActiveTab') }}", // Маршрут для сохранения активного таба
+                method: 'POST',
+                data: {
+                    _token: "{{ csrf_token() }}", // Токен CSRF для безопасности
+                    activeTab: activeTab
+                }
+            });
+        });
+    });
+</script>
+@yield('page_scripts')
 </body>
 </html>
 

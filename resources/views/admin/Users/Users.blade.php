@@ -32,13 +32,15 @@
                                     <th>Фамилия</th>
                                     <th>Номер</th>
                                     <th>Регион</th>
-                                    <th>VIN</th>
+{{--                                    <th>VIN</th>--}}
                                     <th>Гос Номер</th>
                                     <th>Действия</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-
+                                @php
+                                $get_users = $new_users;
+                                @endphp
                                 @foreach($get_users as $item)
 
 
@@ -48,9 +50,15 @@
                                         <td>{{ $item->surname}}</td>
                                         <td>{{$item->phone}} </td>
                                         <td>{{$item->park->region->name??null}} </td>
-                                        <td>{{$item->car[0]->vin??null}} </td>
+{{--                                        <td>{{$item->car[0]->vin??null}} </td>--}}
+                                        @if(!isset($item->car[0]->registration_cert) || $item->car[0]->registration_cert  == null)
+                                        <td>Courier</td>
+                                        @else
                                         <td>{{$item->car[0]->callsign??null}} </td>
-                                        <td><a href="{{route('single_page_user', $item->id)}}" class="btn btn-block btn-primary">Редактирование  </a>  </td>
+                                        @endif
+                                        <td>            <a style="margin: 0 2px; display: flex; justify-content: center; align-items: center;" href="{{route('single_page_user', $item->id)}}">
+                                                <i class="nav-icon fa fa-cogs"></i>
+                                            </a> </td>
                                     </tr>
                                 @endforeach
                                 </tbody>

@@ -1,6 +1,6 @@
 @extends('admin.layouts.default')
 @section('title')
-    Создать новый ключ
+    Кабинеты
 @endsection
 
 
@@ -25,7 +25,7 @@
     @endif
     <div class="card card-primary" bis_skin_checked="1">
         <div class="card-header" bis_skin_checked="1">
-            <h3 class="card-title">Добавления ключа</h3>
+            <h3 class="card-title">Кабинеты </h3>
         </div>
 
 
@@ -86,7 +86,7 @@
 {{--                                </button>--}}
 {{--                            </div>--}}
 {{--                        @endif--}}
-{{--                        <h4 class="card-title">Создать новый ключ</h4>--}}
+{{--                        <h4 class="card-title">Кабинеты </h4>--}}
 {{--                        <form id="myForm" action="{{route('create_key')}}" method="post" class="forms-sample" enctype="multipart/form-data">--}}
 {{--                            @csrf--}}
 {{--                            <div class="form-check" bis_skin_checked="1">--}}

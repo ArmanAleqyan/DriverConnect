@@ -9,4 +9,10 @@ class Mark extends Model
 {
     use HasFactory;
     protected $guarded = [];
+    public function model()
+    {
+        return $this->hasmany(Models::class,'mark_id');
+    }
+
+
 }

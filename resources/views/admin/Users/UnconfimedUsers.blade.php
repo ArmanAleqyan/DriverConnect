@@ -33,7 +33,10 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
+                            <div style="display: flex; justify-content: space-between;align-items: center">
                             <h3 class="card-title">Заявки</h3>
+                                <a style="max-width: 15%" class="btn btn-block btn-warning" href="{{route('create_user_page')}}">Добавить</a>
+                            </div>
                         </div>
                         <!-- /.card-header -->
                         <div class="card-body">

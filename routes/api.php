@@ -7,6 +7,7 @@ use  App\Http\Controllers\Api\V1\GetParametersController;
 use  App\Http\Controllers\Api\V2\ProfileController;
 use  App\Http\Controllers\Api\V2\UserNotificationsForPlatformController;
 use  App\Http\Controllers\Api\V2\CardController;
+use  App\Http\Controllers\Api\V2\Payments\SberbankController;
 use  App\Http\Controllers\Parsing\OrdersController;
 use  App\Http\Controllers\Admin\FaqController;
 /*
@@ -51,6 +52,11 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::post('getAccessToken', 'getAccessToken');
         Route::get('success_add_sum_in_balance', 'success_add_sum_in_balance');
         Route::get('fail_add_sum_in_balance', 'fail_add_sum_in_balance');
+    });
+
+    Route::controller(SberbankController::class)->group(function (){
+       Route::post('getCommission', 'getCommission');
+       Route::post('sendTransfer', 'sendTransfer');
     });
 
     Route::get('get_faqs', [FaqController::class, 'get_faqs']);

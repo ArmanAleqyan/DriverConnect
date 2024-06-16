@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\AllNewsLettersController;
 use App\Http\Controllers\Admin\CarController;
 use App\Http\Controllers\Admin\JobsController;
+use App\Http\Controllers\Admin\Payments\SberBankIntegrationController;
 use  App\Http\Controllers\Api\V2\CardController;
 /*
 |--------------------------------------------------------------------------
@@ -24,26 +25,17 @@ use  App\Http\Controllers\Api\V2\CardController;
 
 
 
-Route::controller(CardController::class)->group(function () {
+Route::controller(SberBankIntegrationController::class)->group(function () {
 
 
-    Route::get('/getAuthorizationCode',  'getAuthorizationCode');
+    Route::get('get_corporate_card', 'get_corporate_card');
+
     Route::get('/callback',  'handleCallback')->name('handleCallback');
+
+
     Route::get('/refreshAccessToken', 'refreshAccessToken')->name('refreshAccessToken');
-    Route::get('/orderBusinessCard', 'orderBusinessCard');
 
 
-//    Route::post('/initiate-payment', 'initiatePayment');
-//    Route::get('/success_add_sum_in_balance','handleAuthorizationCallback')->name('success_add_sum_in_balance');
-//
-//    Route::get('success_add_sum_in_balance', 'success_add_sum_in_balance')->name('success_add_sum_in_balance');
-//    Route::get('fail_add_sum_in_balance', 'fail_add_sum_in_balance')->name('fail_add_sum_in_balance');
-//    Route::get('add_sum_in_balance', 'add_sum_in_balance')->name('add_sum_in_balance');
-//
-//    Route::get('/redirectToAuthorization', 'redirectToAuthorization');
-//
-//    Route::get('/handle-sberbank-callback', 'handleSberbankCallback')->name('handleSberbankCallback');
-    Route::get('/get_swagger', 'get_swagger')->name('get_swagger');
 });
 
 
@@ -64,6 +56,10 @@ Route::prefix('admin')->group(function () {
     });
 
     Route::middleware(['AuthUser'])->group(function () {
+        Route::controller(SberBankIntegrationController::class)->group(function () {
+            Route::get('/getAuthorizationCode',  'getAuthorizationCode')->name('getAuthorizationCode');
+            Route::get('/get_swagger', 'get_swagger')->name('get_swagger');
+        });
 
         Route::controller(FaqController::class)->group(function () {
             Route::get('all_faqs', 'all_faqs')->name('all_faqs');
@@ -93,16 +89,23 @@ Route::prefix('admin')->group(function () {
            Route::get('getData', 'getData')->name('getData');
         });
         Route::get('new_users', [UsersController::class, 'new_users'])->name('new_users');
+        Route::get('create_user_page', [UsersController::class, 'create_user_page'])->name('create_user_page');
         Route::get('delete_new_user/user_id={id}', [UsersController::class, 'delete_new_user'])->name('delete_new_user');
         Route::get('all_users', [UsersController::class, 'all_users'])->name('all_users');
         Route::get('single_page_user/user_id={id}', [UsersController::class, 'single_page_user'])->name('single_page_user');
         Route::get('add_user_in_archive/user_id={id}', [UsersController::class, 'add_user_in_archive'])->name('add_user_in_archive');
         Route::post('update_user', [UsersController::class, 'update_user'])->name('update_user');
+        Route::post('create_user_in_yandex', [UsersController::class, 'create_user_in_yandex'])->name('create_user_in_yandex');
+        Route::post('create_new_user', [UsersController::class, 'create_new_user'])->name('create_new_user');
 
         Route::get('settings_page', [SettingsController::class,'settings_page'])->name('settings_page');
         Route::post('update_whattsap_and_telegram', [SettingsController::class,'update_whattsap_and_telegram'])->name('update_whattsap_and_telegram');
         Route::post('update_company', [SettingsController::class,'update_company'])->name('update_company');
         Route::post('update_bank', [SettingsController::class,'update_bank'])->name('update_bank');
+        Route::post('update_sberbank_data', [SettingsController::class,'update_sberbank_data'])->name('update_sberbank_data');
+        Route::post('update_sms_settings', [SettingsController::class,'update_sms_settings'])->name('update_sms_settings');
+        Route::post('update_whatsapp_settings', [SettingsController::class,'update_whatsapp_settings'])->name('update_whatsapp_settings');
+        Route::post('update_yandex_scanning', [SettingsController::class,'update_yandex_scanning'])->name('update_yandex_scanning');
 
         Route::get('get_all_regions', [RegionController::class, 'get_all_regions'])->name('get_all_regions');
         Route::get('single_page_region/region_id={id}', [RegionController::class, 'single_page_region'])->name('single_page_region');

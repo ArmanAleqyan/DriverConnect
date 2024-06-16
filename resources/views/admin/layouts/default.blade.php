@@ -130,7 +130,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             </p>
                         </a>
                     </li>
-                    <li class="nav-item  @if($routeName== 'new_users'  || $routeName == 'all_users' || $routeName == 'single_page_user')  menu-is-opening menu-open @endif ">
+                    <li class="nav-item  @if( $routeName== 'create_user_page' || $routeName== 'new_users'  || $routeName == 'all_users' || $routeName == 'single_page_user')  menu-is-opening menu-open @endif ">
                         <a href="#" class="nav-link ">
                             <i class="nav-icon fa fa-users"></i>
                             <p>

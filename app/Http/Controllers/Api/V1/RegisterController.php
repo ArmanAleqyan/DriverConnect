@@ -14,6 +14,7 @@ use App\Models\UserCar;
 use App\Models\CarColor;
 use App\Models\CarCategory;
 use App\Models\YandexWorkRule;
+use App\Models\SmsSettings;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
@@ -268,11 +269,13 @@ class RegisterController extends Controller
 
     function send_sms($phone)
     {
+
+        $get_login_password = SmsSettings::first();
         $data = $phone;
         $rand = mt_rand(100000,999999);
         $client = new Client();
-        $login = env('sms_login');
-        $password_sms = env('sms_password');
+        $login = $get_login_password->login??null;
+        $password_sms =$get_login_password->password??null;
         $response = Http::get('https://smsc.ru/sys/send.php', [
             'login' => $login,
             'psw' => $password_sms,
@@ -418,12 +421,12 @@ class RegisterController extends Controller
         $result['car_license_front_photo'] = $originalFile;
         $result['car_license_back_photo'] = $originalFile_back;
 
-        if ($photo_data == null){
-            return response()->json([
-                'status' => false,
-                'message' => 'Что то пошло не так попробуцте немного позже'
-            ],422);
-        }
+//        if ($photo_data == null){
+//            return response()->json([
+//                'status' => false,
+//                'message' => 'Что то пошло не так попробуцте немного позже'
+//            ],422);
+//        }
 
         $data = $result;
         return response()->json([
@@ -533,41 +536,45 @@ class RegisterController extends Controller
         $new_controller = new \App\Http\Controllers\Api\V1\GetParametersController;
        $photo_data =  $new_controller->get_photo_data($base64Image,$extension ,'driver-license-front');
 
+
         $result = [];
-        foreach ($photo_data as $item) {
-            $key = $item['name'];
-            if ($key == 'middle_name' ){
-                $key = 'scanning_person_full_name_middle_name';
+        if (isset($photo_data)){
+            foreach ($photo_data as $item) {
+                $key = $item['name'];
+                if ($key == 'middle_name' ){
+                    $key = 'scanning_person_full_name_middle_name';
+                }
+                if ($key == 'surname' ){
+                    $key = 'scanning_person_full_name_last_name';
+                }
+                if ($key == 'name' ){
+                    $key = 'scanning_person_full_name_first_name';
+                }
+                if ($key == 'birth_date' ){
+                    $key = 'scanning_birth_date';
+                    $item['text'] = Carbon::parse( $item['text'])->format('Y-m-d');
+                }
+                if ($key == 'expiration_date' ){
+                    $key = 'driver_license_expiry_date';
+                    $item['text'] = Carbon::parse( $item['text'])->format('Y-m-d');
+                }
+                if ($key == 'issue_date' ){
+                    $key = 'driver_license_issue_date';
+                    $item['text'] = Carbon::parse( $item['text'])->format('Y-m-d');
+                }
+                if ($key == 'number' ){
+                    $key = 'driver_license_number';
+                }
+                $result[$key] = strtoupper($item['text']);
             }
-            if ($key == 'surname' ){
-                $key = 'scanning_person_full_name_last_name';
-            }
-            if ($key == 'name' ){
-                $key = 'scanning_person_full_name_first_name';
-            }
-            if ($key == 'birth_date' ){
-                $key = 'scanning_birth_date';
-                $item['text'] = Carbon::parse( $item['text'])->format('Y-m-d');
-            }
-            if ($key == 'expiration_date' ){
-                $key = 'driver_license_expiry_date';
-                $item['text'] = Carbon::parse( $item['text'])->format('Y-m-d');
-            }
-            if ($key == 'issue_date' ){
-                $key = 'driver_license_issue_date';
-                $item['text'] = Carbon::parse( $item['text'])->format('Y-m-d');
-            }
-            if ($key == 'number' ){
-                $key = 'driver_license_number';
-            }
-            $result[$key] = strtoupper($item['text']);
         }
-        if ($photo_data == null){
-           return response()->json([
-              'status' => false,
-               'message' => 'Что то пошло не так попробуцте немного позже'
-           ],422);
-       }
+
+//        if ($photo_data == null){
+//           return response()->json([
+//              'status' => false,
+//               'message' => 'Что то пошло не так попробуцте немного позже'
+//           ],422);
+//       }
         auth()->user()->update([
            'driver_license_front_photo' =>$originalFile,
            'driver_license_back_photo' =>$originalFile_back,
@@ -788,6 +795,7 @@ class RegisterController extends Controller
                 'driver_license_experience_total_since_date' =>  $request->driver_license_experience_total_since_date,
                 'job_category_id' => $request->job_category_id,
                 'region_id' => $request->region_id,
+                'park_id' => $get_keys->id,
                 'create_account_status' =>  1,
                 'work_rule_id' =>$get_work_rule->id,
                 'sended_in_yandex_status' =>$send_or_not_send
@@ -868,6 +876,7 @@ class RegisterController extends Controller
                     'date_of_birth' =>    Carbon::parse($request->birth_date)->format('Y-m-d'),
                     'region_id' => $request->region_id,
                     'work_rule_id' =>$get_work_rule->id,
+                    'park_id' => $get_keys->id,
                     'create_account_status' =>  1,
                 ]);
 
@@ -988,7 +997,7 @@ class RegisterController extends Controller
         }
         $get_categories = $get_categories->get('name')->pluck('name')->toarray();
 
-//        dd($get_categories);
+
         $response = Http::withHeaders([
             'X-Park-ID' =>$X_Park_ID,
             'X-Client-ID' => $X_Client_ID,
@@ -996,15 +1005,16 @@ class RegisterController extends Controller
             'X-Idempotency-Token' =>$X_Idempotency_Token,
             'Accept-Language' => 'ru'
         ])->post('https://fleet-api.taxi.yandex.net/v2/parks/vehicles/car', [
-//            "cargo" => [
-//                "cargo_hold_dimensions" => [
-//                    "height" => 150,
-//                    "length" => 200,
-//                    "width" => 200
-//                ],
-//                "cargo_loaders" => 1,
-//                "carrying_capacity" => 500
+            "cargo" => [
+                "cargo_hold_dimensions" => [
+                    "height" => 0,
+                    "length" => 0,
+                    "width" => 0
+                ],
 //            ],
+                "cargo_loaders" => 0,
+                "carrying_capacity" => 0
+            ],
 //            "child_safety" => [
 //                "booster_count" => 2
 //            ],

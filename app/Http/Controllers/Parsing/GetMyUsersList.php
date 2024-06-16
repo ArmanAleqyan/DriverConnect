@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Http\Controllers\Parsing;
@@ -21,13 +22,7 @@ use App\Models\UserWorkStatus;
 class GetMyUsersList extends Controller
 {
    public function get_users(){
-
-
-
        $get_keys = RegionKey::get();
-
-
-
        foreach ($get_keys as $key){
            $X_Park_ID = $key->X_Park_ID;
            $X_Client_ID = $key->X_Client_ID;
@@ -45,10 +40,7 @@ class GetMyUsersList extends Controller
                        ]
                    ]
                ])->json();
-
            $getWorkRules = YandexWorkRule::where('key_id', $key->id)->get();
-
-
            if (isset($response['driver_profiles'])){
                foreach ($response['driver_profiles'] as $driver_profile){
 

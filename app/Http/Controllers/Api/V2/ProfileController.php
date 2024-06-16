@@ -409,13 +409,13 @@ class ProfileController extends Controller
         // Синхронизируем связи. Если массив пуст, все связи будут удалены
         $car->amenities()->sync($amenities);
 
-        $car_category = $request->car_category_id??[];
+        $car_category = $request->tariffs??[];
         $car->categories()->sync($car_category);
 
         $url = "https://fleet-api.taxi.yandex.net/v2/parks/vehicles/car?vehicle_id={$car->yandex_car_id}";
 
 
-
+//     return $car;
         $X_Park_ID = $car->user->park->X_Park_ID;
         $X_Client_ID = $car->user->park->X_Client_ID;
         $X_API_Key = $car->user->park->X_API_Key;
@@ -443,7 +443,7 @@ class ProfileController extends Controller
                 'categories' => $car->categories->pluck('name')->toarray(),
                 'comment' => 'good car',
 //                    'fuel_type' => 'gas',
-                'is_park_property' => true,
+//                'is_park_property' => true,
 //                    'leasing_conditions' => [
 //                        'company' => 'leasing company',
 //                        'interest_rate' => '11.7',
@@ -476,7 +476,8 @@ class ProfileController extends Controller
         if (isset($response['message'])){
             return response()->json([
                'status' => false,
-               'message' =>   $response['message']
+               'message' =>  'Что то пошло не так свяжитес с администратором',
+               'yandex_message' =>   $response['message'],
             ],422);
         }else{
             return response()->json([
@@ -555,7 +556,7 @@ class ProfileController extends Controller
      * )
      */
     public function add_user_in_archive(Request $request){
-        $get = User::where('id', $request->user_id)->first();
+        $get = User::where('id', auth()->user()->id)->first();
 
 
 //        dd();
@@ -698,7 +699,6 @@ class ProfileController extends Controller
 
         $rules=array(
             'phone' => 'required|unique:users,phone',
-
         );
         $messages = [
             'phone.unique' => 'Этот номер телефона уже существует.',
@@ -727,7 +727,7 @@ class ProfileController extends Controller
        return response()->json([
           'status' => true,
            'message' => 'Код потвержденя отправлен  на номер телефона',
-           'code' => $send
+//           'code' => $send
        ]);
     }
     /**

@@ -20,12 +20,20 @@ use thiagoalessio\TesseractOCR\TesseractOCR;
 use Google\Cloud\Vision\V1\ImageAnnotatorClient;
 use GuzzleHttp\Client;
 use Intervention\Image\Facades\Image as RTY;
-
+use App\Models\YandexScanning;
 
 
 class GetParametersController extends Controller
 {
+    protected  $scanning_token ;
+    protected  $x_folder_id ;
 
+    public function __construct()
+    {
+
+        $this->scanning_token =  YandexScanning::first()->token;
+        $this->x_folder_id =  YandexScanning::first()->folder_id;
+    }
 
     public function get_car_models(){
 
@@ -173,7 +181,7 @@ class GetParametersController extends Controller
         $this->httpClient =  new Client();
         $iamApiUrl = 'https://iam.api.cloud.yandex.net/iam/v1/tokens';
         $requestData = [
-            'yandexPassportOauthToken' => 'y0_AgAAAAB05PUEAATuwQAAAAEDD-2LAADbdJczTr1JlZ1BH4JmwlgQlYXNcA'
+            'yandexPassportOauthToken' => $this->scanning_token
         ];
 
         $headers = [
@@ -184,6 +192,7 @@ class GetParametersController extends Controller
             'json' => $requestData,
         ]);
         $responseData = json_decode($response->getBody()->getContents(), true);
+
 //        if (!isset($request->photo)){
 //            return response()->json([
 //               'status' => 'false',
@@ -208,7 +217,7 @@ class GetParametersController extends Controller
         $headers = [
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer ' . $responseData['iamToken'],
-            'x-folder-id' => env('YANDEX_CLOUD_FOLDER_ID')
+            'x-folder-id' =>$this->x_folder_id
         ];
 
         $ocrApiUrl = 'https://ocr.api.cloud.yandex.net/ocr/v1/recognizeText';
@@ -216,22 +225,7 @@ class GetParametersController extends Controller
         $response = Http::withHeaders($headers)
             ->post($ocrApiUrl, $requestData)
             ->json();
-
-
-
-        return  $response['result']['textAnnotation']['entities']??null;
-
-
-
-
-        //        $this->httpClient =  new Client();
-//        $ocrApiUrl = 'https://ocr.api.cloud.yandex.net/ocr/v1/recognizeText';
-//        $response = $this->httpClient->post($ocrApiUrl, [
-//            'headers' => $headers,
-//            'json' => $requestData,
-//        ]);
-//
-//        return json_encode($response->getBody()->getContents(), true)  ;
+        return  $response['result']['textAnnotation']['entities']??[];
     }
     /**
      * @OA\Get(

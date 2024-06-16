@@ -87,34 +87,38 @@
 
 
 
-                <form  id="user_data" action="{{route('update_user')}}" method="post" class="forms-sample" enctype="multipart/form-data">
+                <form  id="user_data" action="   @if($get->contractor_profile_id == null)   {{route('create_user_in_yandex')}} @else {{route('update_user')}} @endif" method="post" class="forms-sample" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="user_id" value="{{$get->id}}">
                     <div style="display: flex; justify-content: space-between">
-                        @if($get->contractor_profile_id != null)
+                        @if($get->contractor_profile_id == null)
+
+
 {{--                            <script>--}}
-{{--                                document.addEventListener('DOMContentLoaded', function() {--}}
-{{--                                    let formElements = document.querySelectorAll('#user_data .form-control');--}}
-{{--                                    formElements.forEach(function(element) {--}}
-{{--                                        if (element.name !== 'phone' && element.name !== 'work_status') {--}}
-{{--                                            element.disabled = true;--}}
+{{--                                $(document).ready(function() {--}}
+{{--                                    // Сделать все поля формы не редактируемыми, кроме телефона и статуса работы--}}
+{{--                                    $('#user_data .form-control').each(function() {--}}
+{{--                                        if ($(this).attr('name') !== 'phone' && $(this).attr('name') !== 'work_status') {--}}
+{{--                                            $(this).prop('disabled', true);--}}
 {{--                                        }--}}
 {{--                                    });--}}
 {{--                                });--}}
 {{--                            </script>--}}
-                            <script>
-                                $(document).ready(function() {
-                                    // Сделать все поля формы не редактируемыми, кроме телефона и статуса работы
-                                    $('#user_data .form-control').each(function() {
-                                        if ($(this).attr('name') !== 'phone' && $(this).attr('name') !== 'work_status') {
-                                            $(this).prop('disabled', true);
-                                        }
-                                    });
-                                });
-                            </script>
                         @endif
                         <div class="card-body" bis_skin_checked="1"  style="max-width: 40%">
-{{--                            <h4>Данные Водителя</h4>--}}
+
+                            @if($get->contractor_profile_id == null)
+                                <div class="form-group" bis_skin_checked="1">
+                                    <label>Тип Работы</label>
+                                    <select name="job_category_ids" class="form-control">
+                                        @foreach($get_job_category as $job_category)
+
+                                        <option @if($get->job_category_id == $job_category->id || old('job_category_ids') ==$job_category->id ) selected @endif value="{{$job_category->id}}">{{$job_category->name}}</option>
+                                            @endforeach
+                                    </select>
+                                </div>
+
+                            @endif
                             <div class="form-group">
                                 @php
                                     $region_park_id =$get->park->region->id??null;
@@ -122,7 +126,7 @@
                                 <label for="">Регион</label>
                                 <select  name="region_id" class="form-control select2" style="width: 100%;">
                                     @foreach ($get_regions as $region)
-                                        @if($region_park_id == $region->id)
+                                        @if($region_park_id == $region->id || old('region_id') == $region->id)
                                             <option selected value="{{ $region->id }}">{{$region->name}}</option>
                                         @else
                                             <option value="{{ $region->id }}">{{$region->name}}</option>
@@ -138,7 +142,7 @@
                                         <span class="input-group-text"><i class="fas fa-phone"></i></span>
                                     </div>
                                     <input  type="text" class="form-control" id="phone" name="phone"
-                                            data-inputmask="'mask': '+7 (999) 999-99-99'" data-mask required placeholder="+7 (999) 999-99-99" value="{{ $get->phone }}">
+                                            data-inputmask="'mask': '+7 (999) 999-99-99'" data-mask required placeholder="+7 (999) 999-99-99" value="{{old('phone')??$get->phone }}">
                                     @error('phone')
                                     <div class="alert alert-danger">{{ $message }}</div>
                                     @enderror
@@ -146,19 +150,19 @@
                             </div>
                             <div class="form-group" bis_skin_checked="1">
                                 <label for="">Имя @if($get->sended_in_yandex_status == 0 )&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: red"> {{$get->scanning_name}}</span> @endif</label>
-                                <input     type="text" class="form-control" id=""  name="name" value="{{$get->name}}">
+                                <input     type="text" class="form-control" id=""  name="name" value="{{old('name')??$get->name}}">
                             </div>
                             <div class="form-group" bis_skin_checked="1">
                                 <label for="">Фамилия @if($get->sended_in_yandex_status == 0)&nbsp;&nbsp;&nbsp;&nbsp;   <span style="color: red">{{$get->scanning_surname}}</span>@endif </label>
-                                <input     type="text" class="form-control" id=""  name="surname" value="{{$get->surname}}">
+                                <input     type="text" class="form-control" id=""  name="surname" value="{{old('surname')??$get->surname}}">
                             </div>
                             <div class="form-group" bis_skin_checked="1">
                                 <label for="">Отчетво  @if($get->sended_in_yandex_status == 0)&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: red">{{$get->scanning_middle_name}}</span>@endif </label>
-                                <input     type="text" class="form-control" id=""  name="middle_name" value="{{$get->middle_name}}">
+                                <input     type="text" class="form-control" id=""  name="middle_name" value="{{old('middle_name')??$get->middle_name}}">
                             </div>
                             <div class="form-group" bis_skin_checked="1">
                                 <label for="">Дата Рождения  @if($get->sended_in_yandex_status == 0)&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: red"> {{$get->scanning_birth_date}}</span>@endif</label>
-                                <input     type="date" class="form-control" id=""  name="birth_date" value="{{\Carbon\Carbon::parse($get->date_of_birth)->format('Y-m-d')}}">
+                                <input     type="date" class="form-control" id=""  name="birth_date" value="{{old('birth_date')??\Carbon\Carbon::parse($get->date_of_birth)->format('Y-m-d')}}">
                             </div>
                         </div>
                             @if(isset($get->contractor_profile_id))
@@ -169,7 +173,7 @@
                                 <label for="year">Стаж с</label>
                                 <select  name="driver_license_experience_total_since_date" class="form-control select2" style="width: 100%;">
                                     @for ($year = now()->year; $year >= 1980; $year--)
-                                        @if($get->driver_license_experience_total_since_date == $year)
+                                        @if($get->driver_license_experience_total_since_date == $year || old('driver_license_experience_total_since_date')==$year)
                                             <option selected value="{{ $year }}">{{ $year }}</option>
                                         @else
                                             <option value="{{ $year }}">{{ $year }}</option>
@@ -180,13 +184,13 @@
                             </div>
                             <div class="form-group" bis_skin_checked="1">
                                 <label for="">Номер ВУ</label>
-                                <input     type="text" class="form-control" id=""  name="driver_license_number" value="{{$get->driver_license_number}}">
+                                <input     type="text" class="form-control" id=""  name="driver_license_number" value="{{old('driver_license_number')??$get->driver_license_number}}">
                             </div>
                             <div class="form-group">
                                 <label for="">Страна Выдачи</label>
                                 <select  name="driver_license_country_id" class="form-control select2" style="width: 100%;">
                                     @foreach ($get_country_drive_licenze as $country)
-                                        @if($get->driver_license_country_id == $country->id)
+                                        @if($get->driver_license_country_id == $country->id || old('driver_license_country_id') == $country->id )
                                             <option selected value="{{ $country->id }}">{{$country->name}}</option>
                                         @else
                                             <option value="{{ $country->id }}">{{$country->name}}</option>
@@ -196,13 +200,13 @@
                             </div>
                             <div class="form-group" bis_skin_checked="1">
                                 <label for="">Дата выдачи</label>
-                                <input     type="date" class="form-control" id="" max="{{\Carbon\Carbon::now()->format('Y-m-d')}}" min="{{\Carbon\Carbon::now()->subYears(20)->format('Y-m-d')}}"  name="driver_license_issue_date" value="{{\Carbon\Carbon::parse($get->driver_license_issue_date)->format('Y-m-d')}}">
+                                <input     type="date" class="form-control" id="" max="{{\Carbon\Carbon::now()->format('Y-m-d')}}" min="{{\Carbon\Carbon::now()->subYears(20)->format('Y-m-d')}}"  name="driver_license_issue_date" value="{{old('driver_license_issue_date')??\Carbon\Carbon::parse($get->driver_license_issue_date)->format('Y-m-d')}}">
                             </div>
                             <div class="form-group" bis_skin_checked="1">
                                 <label for="">Действует до</label>
                                 <input     type="date" class="form-control" id=""
 {{--                                           min="{{\Carbon\Carbon::now()->format('Y-m-d')}}"--}}
-                                           max="{{\Carbon\Carbon::now()->addYears(20)->format('Y-m-d')}}"   name="driver_license_expiry_date" value="{{\Carbon\Carbon::parse($get->driver_license_expiry_date)->format('Y-m-d') }}">
+                                           max="{{\Carbon\Carbon::now()->addYears(20)->format('Y-m-d')}}"   name="driver_license_expiry_date" value="{{ old('driver_license_expiry_date') ?? Carbon\Carbon::parse($get->driver_license_expiry_date)->format('Y-m-d') }}">
                             </div>
 
                             @if($get->contractor_profile_id != null && $get->work_status != null)
@@ -212,7 +216,7 @@
                                         <label>Статус Работы</label>
                                         <select class="form-control" name="work_status">
                                             @foreach($get_yandex_worrk_status as $work_status)
-                                                @if($work_status->name == $get->work_status)
+                                                @if($work_status->name == $get->work_status || old('work_status') == $work_status->name)
                                             <option selected value="{{$work_status->name}}">{{$work_status->show_name}}</option>
                                                @else
                                                     <option value="{{$work_status->name}}">{{$work_status->show_name}}</option>
@@ -483,6 +487,7 @@
         });
     </script>
 {{--    @endif--}}
+
 
     @if($get->contractor_profile_id != null)
         <script>

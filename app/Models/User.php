@@ -30,7 +30,7 @@ class User extends Authenticatable
 
     public function car()
     {
-        return $this->hasMany(UserCar::class, 'user_id')->orderBy('id', 'desc')->limit(1);
+        return $this->hasMany(UserCar::class, 'user_id')->where('status','working')->orderBy('id', 'desc')->limit(1);
     }
 
     public function jobs()

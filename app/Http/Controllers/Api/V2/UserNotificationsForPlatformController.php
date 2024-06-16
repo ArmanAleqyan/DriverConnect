@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V2;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\WappiSettings;
 use App\Models\UserNotificationPivot;
 use App\Models\UserNotificationMessages;
 use Carbon\Carbon;
@@ -123,8 +124,10 @@ class UserNotificationsForPlatformController extends Controller
 
     public function send_message($data){
         // Параметры запроса
-        $profileId = env('WAPPI_ID');
-        $token =env('WAPPI_TOKEN');
+        $get_wa_data = WappiSettings::first();
+        $profileId = $get_wa_data->whatsapp_id;
+
+        $token =$get_wa_data->whatsapp_token;
 
         $recipient = $data['phone'].'12';
         $messageBody = $data['message'];

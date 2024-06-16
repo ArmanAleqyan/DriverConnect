@@ -24,13 +24,19 @@ class CardController extends Controller
     private $truststorePath ;
     private $paymentData;
     private $accessToken;
+    private $scope;
 
     public function __construct()
     {
         $this->redirectUri = route('handleCallback'); // Укажите ваш redirect_uri
-        $this->certPath = public_path('TestCert/certificate.pem'); // Укажите путь к вашему сертификату
-        $this->sslKeyPath = public_path('TestCert/certificate.pem'); // Укажите путь к вашему ключу
-        $this->truststorePath = public_path('TestCert/truststore.pem'); // Укажите путь к вашему truststore
+//      TEST  $this->certPath = public_path('TestCert/certificate.pem'); // Укажите путь к вашему сертификату
+//    TEST    $this->sslKeyPath = public_path('TestCert/certificate.pem'); // Укажите путь к вашему ключу
+   // TEST     $this->truststorePath = public_path('TestCert/truststore.pem'); // Укажите путь к вашему truststore
+
+
+        $this->certPath = public_path('Certs/client_cert.pem'); // Укажите путь к вашему сертификату
+        $this->sslKeyPath = public_path('Certs/client_key.pem'); // Укажите путь к вашему ключу
+        $this->truststorePath = public_path('Certs/combined_real_ca.pem'); // Укажите путь к вашему truststore
 
 
         // Получаем данные из базы данных
@@ -38,6 +44,7 @@ class CardController extends Controller
         $this->clientId =  $this->paymentData->client_id;
         $this->clientSecret =  $this->paymentData->client_secret;
         $this->accessToken = $this->paymentData->access_token;
+        $this->scope = $this->paymentData->scope;
 
     }
 
@@ -45,28 +52,23 @@ class CardController extends Controller
         try {
             $client = new Client();
 
-
-            $response = $client->request('GET', 'https://sbi.sberbank.ru:9443/fintech/api/v1/client-info', [
-                'cert' => [public_path('Certs/sbbapi_cert.pem'), 'Ваш_Пароль'], // Укажите пароль, если он есть
-                'ssl_key' => [public_path('Certs/sbbapi_key.pem'), 'Ваш_Пароль'], // Укажите пароль, если он есть
-                'verify' => public_path('Certs/combined.pem'), // Используйте обновленный файл
+            $response = $client->request('GET', 'https://fintech.sberbank.ru:9443/fintech/api/swagger-ui.html', [
+                'cert' =>   $this->certPath,
+                'ssl_key' => $this->sslKeyPath, // Путь к ключевому файлу
+                'verify' =>  $this->truststorePath,
                 'curl' => [
                     CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
                     CURLOPT_VERBOSE => true,
-                    CURLOPT_SSL_VERIFYPEER => true,
-                    CURLOPT_SSL_VERIFYHOST => 2,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_SSL_VERIFYPEER => true, // Или false, в зависимости от требований безопасности
                 ],
             ]);
-
-
             $res = $response->getBody()->getContents();
-
             return view('swagger',  compact('res')) ;
         } catch (RequestException $e) {
+            // Вернуть ошибку с кодом состояния 500
             return response()->json(['error' => 'Failed to connect to Sberbank API: ' . $e->getMessage()], 500);
         } catch (\Exception $e) {
-
+            // Вернуть ошибку с кодом состояния 500
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
@@ -132,19 +134,22 @@ class CardController extends Controller
             'response_type' => 'code',
             'client_id' => $this->clientId,
             'redirect_uri' => $this->redirectUri,
-            'scope' => 'openid GET_CLIENT_ACCOUNTS GET_STATEMENT_ACCOUNT PAY_DOC_RU PAY_DOC_CUR',
+            'scope' => $this->scope,
             'state' => '296014df-dbc8-4559-ab32-041bf5064a40',
             'nonce' => '80012c9c-1b9a-449e-a8d5-75100ea698ac'
         ];
 
         $query = http_build_query($params);
-        return redirect("https://efs-sbbol-ift-web.testsbi.sberbank.ru:9443/ic/sso/api/v2/oauth/authorize?$query");
+        return redirect("https://sbi.sberbank.ru:9443/ic/sso/api/v2/oauth/authorize?$query");
 
     }
 
 
     public function handleCallback(Request $request)
     {
+
+
+
         $code = $request->query('code');
 
         if (!$code) {
@@ -158,9 +163,11 @@ class CardController extends Controller
             return response()->json(['error' => $tokenData['error']], 400);
         }
 
+
         $this->paymentData->code = $code;
         $this->paymentData->access_token = $tokenData['access_token'];
         $this->paymentData->refresh_token = $tokenData['refresh_token'];
+        $this->paymentData->save();
         return response()->json([
             'access_token' => $tokenData['access_token'],
             'refresh_token' => $tokenData['refresh_token']
@@ -169,48 +176,45 @@ class CardController extends Controller
 
     private function getAccessTokenWithAuthCode($code)
     {
-//        dd($code);
         try {
             $client = new Client();
-            $params = [
-                'grant_type' => 'authorization_code',
-                'client_id' => $this->clientId,
-                'client_secret' => $this->clientSecret,
-                'code' => $code,
-                'redirect_uri' => $this->redirectUri,
-            ];
 
-            $response = $client->request('POST', 'https://iftfintech.testsbi.sberbank.ru:9443/ic/sso/api/v2/oauth/token', [
-                'form_params' => $params,
+            $response = $client->request('POST', 'https://fintech.sberbank.ru:9443/ic/sso/api/v2/oauth/token', [
+                'form_params' => [
+                    'grant_type' => 'authorization_code',
+                    'client_id' => $this->clientId,
+                    'client_secret' => $this->clientSecret,
+                    'code' => $code,
+                    'redirect_uri' => route('handleCallback'),
+                ],
+                'cert' => $this->certPath,
+                'ssl_key' => $this->sslKeyPath,
+                'verify' => $this->truststorePath,
+                'curl' => [
+                    CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
+                    CURLOPT_VERBOSE => true,
+                    CURLOPT_SSL_VERIFYPEER => true,
+                ],
                 'headers' => [
                     'Content-Type' => 'application/x-www-form-urlencoded',
                     'Accept' => 'application/json',
                 ],
-                'cert' => public_path('TestCert/certificate.pem'),
-                'ssl_key' => public_path('TestCert/certificate.pem'),
-                'verify' => public_path('TestCert/truststore.pem'),
-                'curl' => [
-                    CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
-                    CURLOPT_VERBOSE => true,
-                    CURLOPT_SSL_VERIFYPEER => false,
-                ],
             ]);
 
-            $result = json_decode($response->getBody()->getContents(), true);
+            $body = $response->getBody()->getContents();
+            $tokens = json_decode($body, true);
 
-            if (isset($result['access_token']) && isset($result['refresh_token'])) {
-                $this->paymentData->access_token = $result['access_token'];
-                $this->paymentData->refresh_token = $result['refresh_token'];
-                $this->paymentData->code = $code;
-                $this->paymentData->save();
-                return $result;
-            } else {
-                return ['error' => 'Failed to get access token'];
-            }
-        } catch (ClientException $e) {
-            return ['error' => 'Failed to get access token: ' . $e->getResponse()->getBody()->getContents()];
+            // Обработка токенов (например, сохранение в БД или сессии)
+            return $tokens;
+
+        } catch (RequestException $e) {
+            // Логирование ошибки и возврат сообщения об ошибке
+            Log::error('Failed to exchange authorization code: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to exchange authorization code. Please try again later.'], 500);
         } catch (\Exception $e) {
-            return ['error' => 'Failed to get access token: ' . $e->getMessage()];
+            // Логирование ошибки и возврат сообщения об ошибке
+            Log::error('Failed to get access token: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to get access token. Please try again later.'], 500);
         }
     }
 
@@ -227,7 +231,7 @@ class CardController extends Controller
                 'refresh_token' => $refreshToken,
             ];
 
-            $response = $client->request('POST', 'https://iftfintech.testsbi.sberbank.ru:9443/ic/sso/api/v2/oauth/token', [
+            $response = $client->request('POST', 'https://fintech.sberbank.ru:9443/ic/sso/api/v2/oauth/token', [
                 'form_params' => $params,
                 'headers' => [
                     'Content-Type' => 'application/x-www-form-urlencoded',
@@ -245,116 +249,48 @@ class CardController extends Controller
 
             $result = json_decode($response->getBody()->getContents(), true);
 
-            if (isset($result['access_token']) && isset($result['refresh_token'])) {
+
+            if (isset($result['access_token'])) {
                 // Обновляем токены в базе данных
 
                 $this->paymentData->access_token = $result['access_token'];
                 $this->paymentData->refresh_token = $result['refresh_token'];
                 $this->paymentData->save();
-                return ['access_token' => $result['access_token']];
+//                return ['access_token' => $result['access_token']];
             } else {
-                return ['error' => 'Failed to refresh access token'];
+//                return ['error' => 'Failed to refresh access token'];
             }
         } catch (ClientException $e) {
-            return ['error' => 'Failed to refresh access token: ' . $e->getResponse()->getBody()->getContents()];
+//            return ['error' => 'Failed to refresh access token: ' . $e->getResponse()->getBody()->getContents()];
         } catch (\Exception $e) {
-            return ['error' => 'Failed to refresh access token: ' . $e->getMessage()];
+//            return ['error' => 'Failed to refresh access token: ' . $e->getMessage()];
         }
     }
 
-    public function orderBusinessCard(Request $request)
-    {
-        try {
-            $client = new Client();
-            $params = [
-                'typeName' => 'Business card',
-                'paymentSystemName' => 'Visa',
-                'servicePeriod' => 'MONTH',
-                'accountNumber' => '40802810600000200000',
-                'embossedText' => 'SBERBANK',
-                'externalId' => (string) Str::uuid(),
-                'plastic' => true,
-                'cardLimits' => [
-                    'dayCashLimit' => 100000,
-                    'dayNonCashLimit' => 500000,
-                    'dayTransactionsLimit' => 1000000,
-                    'monthCashLimit' => 2000000,
-                    'monthLimitAllOperations' => 5000000,
-                    'monthTransactionsLimit' => 3000000,
-                ],
-                'branchInfo' => [
-                    'address' => 'Москва, ул. Ленина, д. 10',
-                    'agencyCode' => '5221',
-                    'branchCode' => '0480',
-                    'name' => 'Доп. офис №5221/0480',
-                    'regionCode' => '52'
-                ],
-                'cardholder' => [
-                    'birthDate' => '1980-01-01',
-                    'birthPlace' => 'Москва',
-                    'cellphone' => '79991234567',
-                    'citizenship' => 'Россия',
-                    'email' => 'example@example.com',
-                    'firstName' => 'Иван',
-                    'middleName' => 'Иванович',
-                    'lastName' => 'Иванов',
-                    'embossedLastName' => 'IVANOV',
-                    'embossedName' => 'IVAN',
-                    'sex' => '1',
-                    'address' => [
-                        'postalCode' => '123456',
-                        'country' => 'Россия',
-                        'countryCode' => 'RU',
-                        'state' => 'Московская обл.',
-                        'settlementName' => 'Москва',
-                        'city' => 'Москва',
-                        'district' => 'Центральный',
-                        'street' => 'Ленина',
-                        'house' => '10',
-                        'building' => '1',
-                        'flat' => '101'
-                    ],
-                    'identityDoc' => [
-                        'issueDate' => '2000-01-01',
-                        'issuer' => 'ОВД по г. Москва',
-                        'issuerCode' => '770-001',
-                        'number' => '123456',
-                        'serial' => '654321',
-                        'type' => 'Паспорт гражданина Российской Федерации',
-                        'typeCode' => '21'
-                    ]
-                ]
-            ];
 
-            $response = $client->request('POST', 'https://iftfintech.testsbi.sberbank.ru:9443/fintech/api/v1/corporate-card-request', [
-                'json' => $params,
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json',
-                    'Authorization' => 'Bearer ' . $this->accessToken,
-                ],
-                'cert' => $this->certPath,
-                'ssl_key' => $this->sslKeyPath,
-                'verify' => $this->truststorePath,
-                'curl' => [
-                    CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
-                    CURLOPT_VERBOSE => true,
-                    CURLOPT_SSL_VERIFYPEER => false,
-                ],
-            ]);
 
-            $result = json_decode($response->getBody()->getContents(), true);
+    public function get_corporate_card(){
 
-            if (isset($result['error'])) {
-                return response()->json(['error' => $result['error']], 400);
-            }
+        $client = new Client();
+        $response = $client->request('GET', 'https://fintech.sberbank.ru:9443/fintech/api/v1/corporate-cards', [
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+                'Authorization' => 'Bearer ' . $this->accessToken,
+            ],
+            'cert' => $this->certPath,
+            'ssl_key' => $this->sslKeyPath,
+            'verify' => $this->truststorePath,
+            'curl' => [
+                CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
+                CURLOPT_VERBOSE => true,
+                CURLOPT_SSL_VERIFYPEER => true,
+            ],
+        ]);
 
-            return response()->json($result);
-        } catch (ClientException $e) {
-            return response()->json(['error' => 'Failed to order business card: ' . $e->getResponse()->getBody()->getContents()], 400);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to order business card: ' . $e->getMessage()], 500);
-        }
+        $result = json_decode($response->getBody()->getContents(), true);
+
+        dd($result );
     }
     // Метод для выполнения выплаты
     public function initiatePayment(Request $request)
@@ -363,7 +299,7 @@ class CardController extends Controller
         $receiverCardHash = '4083060013614652'; // Хэшированный номер карты получателя, изменить на нужный
 
         // Получение токена доступа
-        $accessToken = $this->getAccessTokenWithAuthCode($request->input('authorization_code'));
+        $accessToken = $this->accessToken;
         if (isset($accessToken['error'])) {
             return response()->json(['error' => $accessToken['error']], 400);
         }
